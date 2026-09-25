@@ -12,7 +12,11 @@ from app.models.user import User
 from app.models.candidate import Candidate
 from app.repositories.candidate_repo import candidate_repo
 from app.repositories.activity_repo import activity_repo
+from app.repositories.enrollment_repo import enrollment_repo
+from app.repositories.placement_repo import placement_repo
 from app.schemas.candidate import CandidateRead, CandidateCreate, CandidateUpdate
+from app.schemas.enrollment import EnrollmentRead
+from app.schemas.placement import PlacementRead
 from app.schemas.common import PaginatedResponse, MessageResponse
 
 router = APIRouter()
@@ -139,3 +143,26 @@ def archive_candidate(
     candidate_repo.soft_delete(db, candidate)
     return MessageResponse(message="Candidate successfully archived")
 
+
+@router.get("/{id}/enrollments", response_model=List[EnrollmentRead], dependencies=[Depends(require_permission("candidates:view"))])
+def get_candidate_enrollments(
+    id: uuid.UUID,
+    db: Session = Depends(get_db)
+):
+    """List all course enrollments for this candidate."""
+    candidate = candidate_repo.get_by_id(db, id=id)
+    if not candidate:
+        raise NotFoundError("Candidate not found")
+    return enrollment_repo.get_candidate_enrollments(db=db, candidate_id=id)
+
+
+@router.get("/{id}/placements", response_model=List[PlacementRead], dependencies=[Depends(require_permission("candidates:view"))])
+def get_candidate_placements(
+    id: uuid.UUID,
+    db: Session = Depends(get_db)
+):
+    """List all placement records for this candidate."""
+    candidate = candidate_repo.get_by_id(db, id=id)
+    if not candidate:
+        raise NotFoundError("Candidate not found")
+    return placement_repo.get_candidate_placements(db=db, candidate_id=id)

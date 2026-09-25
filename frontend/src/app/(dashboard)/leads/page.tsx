@@ -64,6 +64,16 @@ export default function LeadsPage() {
       }),
   });
 
+  const { data: coursesData } = useQuery({
+    queryKey: ["courses-leads"],
+    queryFn: () => crmApi.getCourses({ limit: 100, status: "active" }),
+  });
+
+  const { data: servicesData } = useQuery({
+    queryKey: ["services-leads"],
+    queryFn: () => crmApi.getServices({ limit: 100, status: "active" }),
+  });
+
   const createLeadMutation = useMutation({
     mutationFn: (newLead: LeadCreate) => crmApi.createLead(newLead),
     onSuccess: () => {
@@ -410,6 +420,42 @@ export default function LeadsPage() {
             </div>
           </div>
 
+          {createForm.lead_type === "course" && (
+            <div>
+              <label className="text-xs font-semibold text-slate-700">Course Interested In</label>
+              <select
+                value={createForm.course_id || ""}
+                onChange={(e) => setCreateForm({ ...createForm, course_id: e.target.value || undefined })}
+                className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 mt-1"
+              >
+                <option value="">Select Course</option>
+                {coursesData?.items?.map((crs) => (
+                  <option key={crs.id} value={crs.id}>
+                    {crs.code} — {crs.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {createForm.lead_type === "service" && (
+            <div>
+              <label className="text-xs font-semibold text-slate-700">Service Interested In</label>
+              <select
+                value={createForm.service_id || ""}
+                onChange={(e) => setCreateForm({ ...createForm, service_id: e.target.value || undefined })}
+                className="h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 mt-1"
+              >
+                <option value="">Select Service</option>
+                {servicesData?.items?.map((svc) => (
+                  <option key={svc.id} value={svc.id}>
+                    {svc.code} — {svc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-semibold text-slate-700">Contact First Name</label>
@@ -598,6 +644,22 @@ export default function LeadsPage() {
                 <span className="font-semibold text-slate-500">Phone:</span>
                 <p className="text-slate-800 mt-0.5">{selectedLead.phone || "N/A"}</p>
               </div>
+              {selectedLead.course && (
+                <div className="col-span-2 bg-indigo-50/70 p-2 rounded border border-indigo-100">
+                  <span className="font-semibold text-indigo-700">Course Inquiry:</span>
+                  <p className="text-indigo-900 font-medium mt-0.5">
+                    {selectedLead.course.name} ({selectedLead.course.code})
+                  </p>
+                </div>
+              )}
+              {selectedLead.service && (
+                <div className="col-span-2 bg-emerald-50/70 p-2 rounded border border-emerald-100">
+                  <span className="font-semibold text-emerald-700">Service Inquiry:</span>
+                  <p className="text-emerald-900 font-medium mt-0.5">
+                    {selectedLead.service.name} ({selectedLead.service.code})
+                  </p>
+                </div>
+              )}
             </div>
 
             {selectedLead.assignments && selectedLead.assignments.length > 0 && (

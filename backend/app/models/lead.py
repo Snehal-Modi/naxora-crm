@@ -30,6 +30,12 @@ class Lead(Base, UUIDMixin, AuditMixin):
     company_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("companies.id", ondelete="SET NULL"), index=True, nullable=True
     )
+    course_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("courses.id", ondelete="SET NULL"), index=True, nullable=True
+    )
+    service_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("services.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     assigned_staff_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True, nullable=True
     )
@@ -47,6 +53,8 @@ class Lead(Base, UUIDMixin, AuditMixin):
     stage = relationship("PipelineStage", lazy="selectin")
     candidate = relationship("Candidate", lazy="selectin")
     company = relationship("Company", lazy="selectin")
+    course = relationship("Course", lazy="selectin")
+    service = relationship("Service", lazy="selectin")
     assigned_staff = relationship("User", foreign_keys=[assigned_staff_id], lazy="selectin")
     assignments = relationship("LeadAssignment", back_populates="lead", cascade="all, delete-orphan", order_by="desc(LeadAssignment.assigned_at)")
 

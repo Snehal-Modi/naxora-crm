@@ -15,6 +15,10 @@ import {
   Activity as ActivityIcon,
   CheckCircle2,
   ArrowRight,
+  GraduationCap,
+  BookOpen,
+  UserCheck,
+  Wrench,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { crmApi } from "@/lib/crm-api";
@@ -242,6 +246,155 @@ export default function DashboardPage() {
           </Card>
         </div>
       )}
+
+      {/* Phase 3 Training, Services & Placements Metrics */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wide">
+            Training, Services & Placements Overview
+          </h3>
+          <div className="flex items-center gap-2">
+            <Link href="/courses" className="text-xs text-indigo-600 hover:underline font-medium">
+              Courses →
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link href="/services" className="text-xs text-emerald-600 hover:underline font-medium">
+              Services →
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link href="/placements" className="text-xs text-purple-600 hover:underline font-medium">
+              Placements →
+            </Link>
+          </div>
+        </div>
+
+        {isSuperAdmin ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Active Courses</span>
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.active_courses ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Catalogue live</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Course Inquiries</span>
+                <Clock className="w-3.5 h-3.5 text-blue-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.course_enquiries ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Leads generated</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Active Enrolled</span>
+                <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.active_enrollments ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">In training</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Graduated</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.completed_enrollments ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Courses completed</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Active Services</span>
+                <Wrench className="w-3.5 h-3.5 text-emerald-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.active_services ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Career services</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Placements</span>
+                <UserCheck className="w-3.5 h-3.5 text-purple-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : adminStats?.total_placements ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Interviews & offers</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Candidates Placed</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-emerald-700">
+                {isLoading ? "..." : adminStats?.joined_placements ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Joined employers</p>
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Active Courses</span>
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : staffStats?.active_courses ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Open for students</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>My Enrollments</span>
+                <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : staffStats?.my_enrollments ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Students enrolled</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>My Placements</span>
+                <UserCheck className="w-3.5 h-3.5 text-purple-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : staffStats?.my_placements ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Outcomes tracked</p>
+            </Card>
+
+            <Card className="p-3 bg-white border-slate-200">
+              <div className="flex items-center justify-between text-xs text-slate-500">
+                <span>Course Enquiries</span>
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">
+                {isLoading ? "..." : staffStats?.course_enquiries ?? 0}
+              </div>
+              <p className="text-[11px] text-slate-400">Leads interested</p>
+            </Card>
+          </div>
+        )}
+      </div>
 
       {/* Main Two-Column View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

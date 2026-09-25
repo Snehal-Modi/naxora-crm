@@ -77,6 +77,47 @@ INITIAL_PERMISSIONS = [
     ("notes:create", "notes", "Add notes to candidates, leads, employers, or jobs"),
     ("notes:edit", "notes", "Edit existing notes"),
 
+    # Courses
+    ("courses:view", "courses", "View courses and catalogue"),
+    ("courses:create", "courses", "Create and publish courses"),
+    ("courses:edit", "courses", "Edit course information and schedule"),
+    ("courses:archive", "courses", "Archive courses"),
+
+    # Course Categories
+    ("course_categories:view", "course_categories", "View course categories"),
+    ("course_categories:create", "course_categories", "Create course categories"),
+    ("course_categories:edit", "course_categories", "Edit course categories"),
+    ("course_categories:archive", "course_categories", "Archive course categories"),
+
+    # Enrollments
+    ("enrollments:view", "enrollments", "View course enrollments and student progress"),
+    ("enrollments:create", "enrollments", "Enroll candidates in courses"),
+    ("enrollments:edit", "enrollments", "Update enrollment progress and completion"),
+    ("enrollments:archive", "enrollments", "Cancel or archive enrollments"),
+
+    # Services
+    ("services:view", "services", "View service catalogue"),
+    ("services:create", "services", "Create new service offerings"),
+    ("services:edit", "services", "Edit service offerings"),
+    ("services:archive", "services", "Archive service offerings"),
+
+    # Service Categories
+    ("service_categories:view", "service_categories", "View service categories"),
+    ("service_categories:create", "service_categories", "Create service categories"),
+    ("service_categories:edit", "service_categories", "Edit service categories"),
+    ("service_categories:archive", "service_categories", "Archive service categories"),
+
+    # Placements
+    ("placements:view", "placements", "View candidate placements and outcomes"),
+    ("placements:create", "placements", "Create candidate placement tracking records"),
+    ("placements:edit", "placements", "Update placement status, offers, and join dates"),
+    ("placements:archive", "placements", "Archive placement records"),
+
+    # Documents
+    ("documents:view", "documents", "View and download candidate resumes and documents"),
+    ("documents:create", "documents", "Upload candidate resumes and documents"),
+    ("documents:delete", "documents", "Delete or archive candidate documents"),
+
     # Reports
     ("reports:view", "reports", "Access CRM analytics and operational reports"),
 
@@ -89,9 +130,6 @@ INITIAL_PERMISSIONS = [
 ]
 
 STAFF_PERMISSIONS = [
-    "leads:view", "leads:create", "leads:edit",
-    "candidates:view", "candidates:create", "candidates:edit",
-    "employers:view", "employers:create", "employers:edit",
     "leads:view", "leads:create", "leads:edit", "leads:archive",
     "candidates:view", "candidates:create", "candidates:edit", "candidates:archive",
     "companies:view", "companies:create", "companies:edit", "companies:archive",
@@ -101,6 +139,13 @@ STAFF_PERMISSIONS = [
     "tasks:view", "tasks:create", "tasks:edit", "tasks:complete",
     "activities:view", "activities:create",
     "notes:view", "notes:create", "notes:edit",
+    "courses:view", "courses:create", "courses:edit",
+    "course_categories:view",
+    "enrollments:view", "enrollments:create", "enrollments:edit",
+    "services:view", "services:create", "services:edit",
+    "service_categories:view",
+    "placements:view", "placements:create", "placements:edit",
+    "documents:view", "documents:create", "documents:delete",
     "reports:view"
 ]
 

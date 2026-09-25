@@ -13,6 +13,14 @@ class AdminDashboardStats(BaseModel):
     open_jobs: int
     pending_tasks: int
     upcoming_interviews: int
+    active_courses: int = 0
+    course_enquiries: int = 0
+    active_enrollments: int = 0
+    completed_enrollments: int = 0
+    active_services: int = 0
+    service_enquiries: int = 0
+    total_placements: int = 0
+    joined_placements: int = 0
     recent_activities: List[ActivityRead] = []
     urgent_tasks: List[TaskRead] = []
 
@@ -23,6 +31,9 @@ class StaffDashboardStats(BaseModel):
     my_employers: int
     my_tasks: int
     overdue_tasks: int
+    my_enrollments: int = 0
+    my_placements: int = 0
+    active_courses: int = 0
+    course_enquiries: int = 0
     recent_activities: List[ActivityRead] = []
     today_tasks: List[TaskRead] = []
-

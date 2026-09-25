@@ -1,7 +1,6 @@
 """Master API v1 router definition."""
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import health, auth, users, roles
 from app.api.v1.endpoints import (
     health,
     auth,
@@ -16,6 +15,11 @@ from app.api.v1.endpoints import (
     activities,
     notes,
     dashboards,
+    courses,
+    services,
+    enrollments,
+    placements,
+    documents,
 )
 
 api_router = APIRouter()
@@ -36,3 +40,10 @@ api_router.include_router(tasks.router, prefix="/tasks", tags=["Tasks & Follow-u
 api_router.include_router(activities.router, prefix="/activities", tags=["Activities & Audit"])
 api_router.include_router(notes.router, prefix="/notes", tags=["Notes"])
 api_router.include_router(dashboards.router, prefix="/dashboards", tags=["Dashboard"])
+
+# Phase 3 Modules
+api_router.include_router(courses.router, prefix="/courses", tags=["Courses & Training"])
+api_router.include_router(services.router, prefix="/services", tags=["Services Catalogue"])
+api_router.include_router(enrollments.router, prefix="/enrollments", tags=["Enrollments"])
+api_router.include_router(placements.router, prefix="/placements", tags=["Placements"])
+api_router.include_router(documents.router, tags=["Candidate Documents"])

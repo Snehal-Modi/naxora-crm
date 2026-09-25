@@ -7,6 +7,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from app.schemas.company import StaffSummary, CompanyRead
 from app.schemas.candidate import CandidateRead
 from app.schemas.pipeline import PipelineStageRead, PipelineRead
+from app.schemas.course import CourseSummary
+from app.schemas.service import ServiceSummary
 
 
 class LeadAssignmentRead(BaseModel):
@@ -35,6 +37,8 @@ class LeadBase(BaseModel):
     stage_id: Optional[uuid.UUID] = None
     candidate_id: Optional[uuid.UUID] = None
     company_id: Optional[uuid.UUID] = None
+    course_id: Optional[uuid.UUID] = None
+    service_id: Optional[uuid.UUID] = None
     assigned_staff_id: Optional[uuid.UUID] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -60,6 +64,8 @@ class LeadUpdate(BaseModel):
     stage_id: Optional[uuid.UUID] = None
     candidate_id: Optional[uuid.UUID] = None
     company_id: Optional[uuid.UUID] = None
+    course_id: Optional[uuid.UUID] = None
+    service_id: Optional[uuid.UUID] = None
     assigned_staff_id: Optional[uuid.UUID] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -80,7 +86,8 @@ class LeadRead(LeadBase):
     pipeline: Optional[PipelineRead] = None
     candidate: Optional[CandidateRead] = None
     company: Optional[CompanyRead] = None
+    course: Optional[CourseSummary] = None
+    service: Optional[ServiceSummary] = None
     assignments: List[LeadAssignmentRead] = []
 
     model_config = ConfigDict(from_attributes=True)
-

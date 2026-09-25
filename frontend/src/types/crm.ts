@@ -163,6 +163,158 @@ export interface Pipeline {
   stages: PipelineStage[];
 }
 
+// ==================== COURSES & CATEGORIES ====================
+export interface CourseCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseCategoryCreate {
+  name: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export interface CourseCategoryUpdate {
+  name?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export interface CourseSummary {
+  id: string;
+  name: string;
+  code: string;
+  duration?: string | null;
+  mode: string;
+  fee: number;
+  status: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  short_description?: string | null;
+  category_id?: string | null;
+  duration?: string | null;
+  mode: string; // online, offline, hybrid
+  fee: number;
+  status: string; // draft, active, inactive, completed, archived
+  capacity: number;
+  start_date?: string | null;
+  end_date?: string | null;
+  created_at: string;
+  updated_at: string;
+  category?: CourseCategory | null;
+  created_by?: StaffSummary | null;
+  enrollment_count: number;
+}
+
+export interface CourseCreate {
+  name: string;
+  code: string;
+  description?: string;
+  short_description?: string;
+  category_id?: string;
+  duration?: string;
+  mode?: string;
+  fee: number;
+  status?: string;
+  capacity?: number;
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface CourseUpdate {
+  name?: string;
+  code?: string;
+  description?: string;
+  short_description?: string;
+  category_id?: string;
+  duration?: string;
+  mode?: string;
+  fee?: number;
+  status?: string;
+  capacity?: number;
+  start_date?: string;
+  end_date?: string;
+}
+
+// ==================== SERVICES & CATEGORIES ====================
+export interface ServiceCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceCategoryCreate {
+  name: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export interface ServiceCategoryUpdate {
+  name?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export interface ServiceSummary {
+  id: string;
+  name: string;
+  code: string;
+  delivery_mode: string;
+  fee: number;
+  status: string;
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  short_description?: string | null;
+  category_id?: string | null;
+  delivery_mode: string; // online, offline, hybrid
+  fee: number;
+  status: string; // draft, active, inactive, archived
+  created_at: string;
+  updated_at: string;
+  category?: ServiceCategory | null;
+  created_by?: StaffSummary | null;
+}
+
+export interface ServiceCreate {
+  name: string;
+  code: string;
+  description?: string;
+  short_description?: string;
+  category_id?: string;
+  delivery_mode?: string;
+  fee: number;
+  status?: string;
+}
+
+export interface ServiceUpdate {
+  name?: string;
+  code?: string;
+  description?: string;
+  short_description?: string;
+  category_id?: string;
+  delivery_mode?: string;
+  fee?: number;
+  status?: string;
+}
+
 // ==================== LEAD ====================
 export interface LeadAssignment {
   id: string;
@@ -176,7 +328,7 @@ export interface LeadAssignment {
 export interface Lead {
   id: string;
   title: string;
-  lead_type: string;
+  lead_type: string; // candidate, employer, course, service
   source: string;
   status: string;
   priority: string;
@@ -184,6 +336,8 @@ export interface Lead {
   stage_id?: string | null;
   candidate_id?: string | null;
   company_id?: string | null;
+  course_id?: string | null;
+  service_id?: string | null;
   assigned_staff_id?: string | null;
   first_name?: string | null;
   last_name?: string | null;
@@ -198,6 +352,8 @@ export interface Lead {
   assigned_staff?: StaffSummary | null;
   stage?: PipelineStage | null;
   pipeline?: Pipeline | null;
+  course?: CourseSummary | null;
+  service?: ServiceSummary | null;
   assignments: LeadAssignment[];
 }
 
@@ -211,6 +367,8 @@ export interface LeadCreate {
   stage_id?: string;
   candidate_id?: string;
   company_id?: string;
+  course_id?: string;
+  service_id?: string;
   assigned_staff_id?: string;
   first_name?: string;
   last_name?: string;
@@ -228,12 +386,11 @@ export interface CandidateJobMatch {
   job_id: string;
   status: string;
   notes?: string | null;
+  submitted_date: string;
   interview_date?: string | null;
   result?: string | null;
   placement_status?: string | null;
-  submitted_date: string;
-  created_at: string;
-  candidate?: Candidate | null;
+  candidate?: Candidate;
 }
 
 export interface JobRequirement {
@@ -258,7 +415,8 @@ export interface JobRequirement {
   notes?: string | null;
   created_at: string;
   updated_at: string;
-  company?: Company | null;
+  company?: Company;
+  contact?: Contact;
   assigned_staff?: StaffSummary | null;
   candidate_matches: CandidateJobMatch[];
 }
@@ -279,7 +437,122 @@ export interface JobRequirementCreate {
   status?: string;
   priority?: string;
   assigned_staff_id?: string;
+  opened_date?: string;
+  closing_date?: string;
   notes?: string;
+}
+
+// ==================== ENROLLMENTS ====================
+export interface Enrollment {
+  id: string;
+  candidate_id: string;
+  course_id: string;
+  enrollment_date: string;
+  status: string; // enrolled, in_progress, completed, dropped, cancelled
+  progress_percentage: number; // 0 to 100
+  fee_paid: number;
+  payment_status: string; // pending, partial, paid, refunded
+  completion_date?: string | null;
+  certificate_issued: boolean;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  candidate?: Candidate | null;
+  course?: CourseSummary | null;
+  created_by?: StaffSummary | null;
+}
+
+export interface EnrollmentCreate {
+  candidate_id: string;
+  course_id: string;
+  enrollment_date?: string;
+  status?: string;
+  progress_percentage?: number;
+  fee_paid?: number;
+  payment_status?: string;
+  completion_date?: string;
+  certificate_issued?: boolean;
+  notes?: string;
+}
+
+export interface EnrollmentUpdate {
+  status?: string;
+  progress_percentage?: number;
+  fee_paid?: number;
+  payment_status?: string;
+  completion_date?: string;
+  certificate_issued?: boolean;
+  notes?: string;
+}
+
+export interface EnrollmentProgressUpdate {
+  progress_percentage: number;
+  status?: string;
+  completion_date?: string;
+  notes?: string;
+}
+
+// ==================== PLACEMENTS ====================
+export interface Placement {
+  id: string;
+  candidate_id: string;
+  company_id: string;
+  job_requirement_id?: string | null;
+  status: string; // applied, screening, interview_scheduled, interview_completed, offered, joined, rejected, backed_out
+  interview_date?: string | null;
+  offer_date?: string | null;
+  joining_date?: string | null;
+  salary_offered?: number | null;
+  placement_fee?: number | null;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  candidate?: Candidate | null;
+  company?: Company | null;
+  job_requirement?: JobRequirement | null;
+  created_by?: StaffSummary | null;
+}
+
+export interface PlacementCreate {
+  candidate_id: string;
+  company_id: string;
+  job_requirement_id?: string;
+  status?: string;
+  interview_date?: string;
+  offer_date?: string;
+  joining_date?: string;
+  salary_offered?: number;
+  placement_fee?: number;
+  notes?: string;
+}
+
+export interface PlacementUpdate {
+  candidate_id?: string;
+  company_id?: string;
+  job_requirement_id?: string;
+  status?: string;
+  interview_date?: string;
+  offer_date?: string;
+  joining_date?: string;
+  salary_offered?: number;
+  placement_fee?: number;
+  notes?: string;
+}
+
+// ==================== CANDIDATE DOCUMENTS ====================
+export interface CandidateDocument {
+  id: string;
+  candidate_id: string;
+  title: string;
+  document_type: string; // resume, id_proof, educational, certificate, offer_letter, payslip, other
+  file_name: string;
+  file_size: number;
+  mime_type: string;
+  is_verified: boolean;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+  uploaded_by?: StaffSummary | null;
 }
 
 // ==================== TASK ====================
@@ -287,7 +560,7 @@ export interface Task {
   id: string;
   title: string;
   description?: string | null;
-  assigned_user_id: string;
+  assigned_user_id?: string | null;
   due_date?: string | null;
   priority: string;
   status: string;
@@ -352,6 +625,14 @@ export interface AdminDashboardStats {
   open_jobs: number;
   pending_tasks: number;
   upcoming_interviews: number;
+  active_courses: number;
+  course_enquiries: number;
+  active_enrollments: number;
+  completed_enrollments: number;
+  active_services: number;
+  service_enquiries: number;
+  total_placements: number;
+  joined_placements: number;
   recent_activities: Activity[];
   urgent_tasks: Task[];
 }
@@ -362,7 +643,10 @@ export interface StaffDashboardStats {
   my_employers: number;
   my_tasks: number;
   overdue_tasks: number;
+  my_enrollments: number;
+  my_placements: number;
+  active_courses: number;
+  course_enquiries: number;
   recent_activities: Activity[];
   today_tasks: Task[];
 }
-

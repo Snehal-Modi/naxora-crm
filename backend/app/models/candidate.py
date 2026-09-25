@@ -44,6 +44,9 @@ class Candidate(Base, UUIDMixin, AuditMixin):
 
     assigned_staff = relationship("User", foreign_keys=[assigned_staff_id], lazy="selectin")
     job_matches = relationship("CandidateJobMatch", back_populates="candidate", cascade="all, delete-orphan")
+    enrollments = relationship("Enrollment", back_populates="candidate", cascade="all, delete-orphan")
+    placements = relationship("Placement", back_populates="candidate", cascade="all, delete-orphan")
+    documents = relationship("CandidateDocument", back_populates="candidate", cascade="all, delete-orphan")
 
     @property
     def full_name(self) -> str:

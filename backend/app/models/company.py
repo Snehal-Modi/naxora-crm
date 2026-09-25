@@ -31,6 +31,7 @@ class Company(Base, UUIDMixin, AuditMixin):
     assigned_staff = relationship("User", foreign_keys=[assigned_staff_id], lazy="selectin")
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan", lazy="selectin")
     jobs = relationship("JobRequirement", back_populates="company")
+    placements = relationship("Placement", back_populates="company", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<Company(name='{self.name}', status='{self.status}')>"

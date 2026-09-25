@@ -54,3 +54,20 @@ class ConflictError(CRMException):
             error_code="RESOURCE_CONFLICT"
         )
 
+
+class BadRequestError(CRMException):
+    def __init__(self, detail: str = "Bad request"):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=detail,
+            error_code="BAD_REQUEST"
+        )
+
+
+class ValidationError(CRMException):
+    def __init__(self, detail: str = "Validation failed"):
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=detail,
+            error_code="VALIDATION_ERROR"
+        )

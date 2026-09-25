@@ -13,6 +13,10 @@ from app.models.company import Company
 from app.models.lead import Lead
 from app.models.job import JobRequirement
 from app.models.task import Task
+from app.models.course import Course
+from app.models.service import Service
+from app.models.enrollment import Enrollment
+from app.models.placement import Placement
 from app.repositories.activity_repo import activity_repo
 from app.schemas.dashboard import AdminDashboardStats, StaffDashboardStats
 
@@ -31,6 +35,43 @@ def get_dashboard_stats(
     """
     now = datetime.now(timezone.utc)
     recent_activities = activity_repo.get_timeline(db=db, limit=10)
+
+    # Enterprise-wide metrics for courses, services, and enquiries
+    active_courses = db.scalar(
+        select(func.count(Course.id)).where(Course.is_deleted == False, Course.status == "active")
+    ) or 0
+
+    course_enquiries = db.scalar(
+        select(func.count(Lead.id)).where(Lead.is_deleted == False, Lead.lead_type == "course")
+    ) or 0
+
+    active_enrollments = db.scalar(
+        select(func.count(Enrollment.id)).where(
+            Enrollment.is_deleted == False, Enrollment.status.in_(["enrolled", "in_progress"])
+        )
+    ) or 0
+
+    completed_enrollments = db.scalar(
+        select(func.count(Enrollment.id)).where(
+            Enrollment.is_deleted == False, Enrollment.status == "completed"
+        )
+    ) or 0
+
+    active_services = db.scalar(
+        select(func.count(Service.id)).where(Service.is_deleted == False, Service.status == "active")
+    ) or 0
+
+    service_enquiries = db.scalar(
+        select(func.count(Lead.id)).where(Lead.is_deleted == False, Lead.lead_type == "service")
+    ) or 0
+
+    total_placements = db.scalar(
+        select(func.count(Placement.id)).where(Placement.is_deleted == False)
+    ) or 0
+
+    joined_placements = db.scalar(
+        select(func.count(Placement.id)).where(Placement.is_deleted == False, Placement.status == "joined")
+    ) or 0
 
     if current_user.is_superuser:
         total_candidates = db.scalar(
@@ -75,6 +116,14 @@ def get_dashboard_stats(
             open_jobs=open_jobs,
             pending_tasks=pending_tasks,
             upcoming_interviews=upcoming_interviews,
+            active_courses=active_courses,
+            course_enquiries=course_enquiries,
+            active_enrollments=active_enrollments,
+            completed_enrollments=completed_enrollments,
+            active_services=active_services,
+            service_enquiries=service_enquiries,
+            total_placements=total_placements,
+            joined_placements=joined_placements,
             recent_activities=recent_activities,
             urgent_tasks=urgent_tasks
         )
@@ -109,6 +158,20 @@ def get_dashboard_stats(
             )
         ) or 0
 
+        my_enrollments = db.scalar(
+            select(func.count(Enrollment.id)).where(
+                Enrollment.is_deleted == False,
+                Enrollment.created_by_id == current_user.id
+            )
+        ) or 0
+
+        my_placements = db.scalar(
+            select(func.count(Placement.id)).where(
+                Placement.is_deleted == False,
+                Placement.created_by_id == current_user.id
+            )
+        ) or 0
+
         today_tasks_query = select(Task).where(
             Task.is_deleted == False,
             Task.status.notin_(["completed", "cancelled"]),
@@ -122,7 +185,10 @@ def get_dashboard_stats(
             my_employers=my_employers,
             my_tasks=my_tasks,
             overdue_tasks=overdue_tasks,
+            my_enrollments=my_enrollments,
+            my_placements=my_placements,
+            active_courses=active_courses,
+            course_enquiries=course_enquiries,
             recent_activities=recent_activities,
             today_tasks=today_tasks
         )
-

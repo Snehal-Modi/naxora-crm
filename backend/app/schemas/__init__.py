@@ -26,6 +26,23 @@ from app.schemas.task import TaskCreate, TaskUpdate, TaskRead
 from app.schemas.activity import ActivityCreate, ActivityRead
 from app.schemas.note import NoteCreate, NoteUpdate, NoteRead
 from app.schemas.dashboard import AdminDashboardStats, StaffDashboardStats
+from app.schemas.course import (
+    CourseCategoryBase, CourseCategoryCreate, CourseCategoryUpdate, CourseCategoryRead,
+    CourseSummary, CourseBase, CourseCreate, CourseUpdate, CourseRead
+)
+from app.schemas.service import (
+    ServiceCategoryBase, ServiceCategoryCreate, ServiceCategoryUpdate, ServiceCategoryRead,
+    ServiceSummary, ServiceBase, ServiceCreate, ServiceUpdate, ServiceRead
+)
+from app.schemas.enrollment import (
+    EnrollmentBase, EnrollmentCreate, EnrollmentUpdate, EnrollmentProgressUpdate, EnrollmentRead
+)
+from app.schemas.placement import (
+    PlacementBase, PlacementCreate, PlacementUpdate, PlacementRead
+)
+from app.schemas.document import (
+    DocumentBase, DocumentCreate, DocumentUpdate, DocumentRead
+)
 
 __all__ = [
     "MessageResponse",
@@ -79,5 +96,35 @@ __all__ = [
     "NoteRead",
     "AdminDashboardStats",
     "StaffDashboardStats",
+    "CourseCategoryBase",
+    "CourseCategoryCreate",
+    "CourseCategoryUpdate",
+    "CourseCategoryRead",
+    "CourseSummary",
+    "CourseBase",
+    "CourseCreate",
+    "CourseUpdate",
+    "CourseRead",
+    "ServiceCategoryBase",
+    "ServiceCategoryCreate",
+    "ServiceCategoryUpdate",
+    "ServiceCategoryRead",
+    "ServiceSummary",
+    "ServiceBase",
+    "ServiceCreate",
+    "ServiceUpdate",
+    "ServiceRead",
+    "EnrollmentBase",
+    "EnrollmentCreate",
+    "EnrollmentUpdate",
+    "EnrollmentProgressUpdate",
+    "EnrollmentRead",
+    "PlacementBase",
+    "PlacementCreate",
+    "PlacementUpdate",
+    "PlacementRead",
+    "DocumentBase",
+    "DocumentCreate",
+    "DocumentUpdate",
+    "DocumentRead",
 ]
-

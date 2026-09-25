@@ -13,6 +13,11 @@ from app.models.job import JobRequirement, CandidateJobMatch
 from app.models.task import Task
 from app.models.activity import Activity
 from app.models.note import Note
+from app.models.course import CourseCategory, Course
+from app.models.service import ServiceCategory, Service
+from app.models.enrollment import Enrollment
+from app.models.placement import Placement
+from app.models.document import CandidateDocument
 
 __all__ = [
     "Base",
@@ -36,5 +41,11 @@ __all__ = [
     "Task",
     "Activity",
     "Note",
+    "CourseCategory",
+    "Course",
+    "ServiceCategory",
+    "Service",
+    "Enrollment",
+    "Placement",
+    "CandidateDocument",
 ]
-

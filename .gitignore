@@ -53,8 +53,10 @@ pnpm-debug.log*
 *.db
 backend/media/
 backend/uploads/
+backend/storage/
 media/
 uploads/
+storage/
 
 # IDE & OS
 .vscode/
