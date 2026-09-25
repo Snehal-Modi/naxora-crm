@@ -2,16 +2,23 @@
 
 import React from "react";
 import Link from "next/link";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Users,
-  UserSquare2,
   Briefcase,
   CheckSquare,
   Shield,
   Plus,
-  Database,
+  Clock,
+  Building2,
+  Calendar,
+  Activity as ActivityIcon,
+  CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
+import { crmApi } from "@/lib/crm-api";
+import { AdminDashboardStats, StaffDashboardStats, Task } from "@/types/crm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +26,24 @@ import { EmptyState } from "@/components/shared/empty-state";
 
 export default function DashboardPage() {
   const { user, hasRole } = useAuth();
+  const queryClient = useQueryClient();
   const isSuperAdmin = user?.is_superuser || hasRole("super_admin");
+
+  const { data: stats, isLoading, error } = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: () => crmApi.getStats(),
+    refetchInterval: 30000,
+  });
+
+  const completeTaskMutation = useMutation({
+    mutationFn: (taskId: string) => crmApi.completeTask(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    },
+  });
+
+  const adminStats = isSuperAdmin ? (stats as AdminDashboardStats) : null;
+  const staffStats = !isSuperAdmin ? (stats as StaffDashboardStats) : null;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -36,154 +60,331 @@ export default function DashboardPage() {
           </div>
           <p className="text-sm text-slate-500">
             {isSuperAdmin
-              ? "Nexora Staffing LLP • Master Administration & System Governance"
-              : "Nexora Staffing LLP • Recruitment & Placement Workspace"}
+              ? "Nexora Staffing LLP • Enterprise CRM Governance & Pipeline Intelligence"
+              : "Nexora Staffing LLP • Recruitment, Matching & Candidate Placement"}
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
-          {isSuperAdmin ? (
-            <Link href="/settings">
-              <Button variant="outline" size="sm">
-                <Database className="h-4 w-4 mr-1.5 text-blue-600" />
-                Manage Staff & Roles
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/leads">
-              <Button variant="primary" size="sm">
-                <Plus className="h-4 w-4 mr-1.5" />
-                Create Lead
-              </Button>
-            </Link>
-          )}
+          <Link href="/leads">
+            <Button variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-1.5" />
+              New Lead
+            </Button>
+          </Link>
+          <Link href="/candidates">
+            <Button variant="primary" size="sm">
+              <Users className="h-4 w-4 mr-1.5" />
+              Add Candidate
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* System Status / Architecture Phase Card */}
-      <Card className="border-blue-100 bg-gradient-to-r from-blue-50/50 via-white to-slate-50">
-        <CardContent className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* CRM Phase 2 Operational Status */}
+      <Card className="border-blue-100 bg-gradient-to-r from-blue-50/60 via-white to-slate-50">
+        <CardContent className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
               <Shield className="h-5 w-5" />
             </div>
             <div>
               <h2 className="text-sm font-semibold text-slate-900">
-                Phase 1 Active: Foundation & RBAC Complete
+                Phase 2 Core CRM Live • Real-Time Database Mode
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                FastAPI 0.115 + Next.js App Router + PostgreSQL 18.3 + Argon2id Password Hashing + Dual-Token RBAC
+                Role-based scoping active. All metrics derived from PostgreSQL transactions.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-              PostgreSQL Connected
+            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              Database Synced
             </span>
-            <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
-              RBAC Enforced
+            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+              Audit Logger Active
             </span>
           </div>
         </CardContent>
       </Card>
 
-      {/* Admin Dashboard View */}
-      {isSuperAdmin ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>Candidate Pipeline</span>
-                  <Users className="h-4 w-4 text-slate-400" />
-                </CardTitle>
-                <CardDescription>Live job seeker records in CRM</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={Users}
-                  title="No candidates available"
-                  description="Candidate management activates in Phase 3. Ready to import and register candidates."
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>Active Leads</span>
-                  <UserSquare2 className="h-4 w-4 text-slate-400" />
-                </CardTitle>
-                <CardDescription>Candidate, Employer & Course enquiries</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={UserSquare2}
-                  title="No leads yet"
-                  description="Lead pipelines and automated stages activate in Phase 3."
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>Open Job Positions</span>
-                  <Briefcase className="h-4 w-4 text-slate-400" />
-                </CardTitle>
-                <CardDescription>Employer requirements & openings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={Briefcase}
-                  title="No jobs posted yet"
-                  description="Job posting, screening, and matching activate in Phase 4."
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      ) : (
-        /* Staff Dashboard View */
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>My Assigned Leads</span>
-                  <UserSquare2 className="h-4 w-4 text-slate-400" />
-                </CardTitle>
-                <CardDescription>Follow-ups and candidate enquiries assigned to you</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={UserSquare2}
-                  title="No leads assigned"
-                  description="You currently have zero active leads in your queue. New assignments will appear here."
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center justify-between">
-                  <span>Today&apos;s Tasks &amp; Follow-ups</span>
-                  <CheckSquare className="h-4 w-4 text-slate-400" />
-                </CardTitle>
-                <CardDescription>Calls, meetings, and candidate submissions scheduled</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={CheckSquare}
-                  title="No tasks assigned"
-                  description="All clear! You have no pending follow-up tasks scheduled for today."
-                />
-              </CardContent>
-            </Card>
-          </div>
+      {/* Error state */}
+      {error && (
+        <div className="p-4 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
+          Failed to load real-time dashboard data. Please check network connectivity or refresh.
         </div>
       )}
+
+      {/* Metric Cards Grid */}
+      {isSuperAdmin ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Candidates</span>
+              <Users className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.total_candidates ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">In talent database</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Employers</span>
+              <Building2 className="h-4 w-4 text-indigo-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.total_employers ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Companies registered</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Active Leads</span>
+              <Clock className="h-4 w-4 text-amber-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.active_leads ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Pipeline inquiries</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Open Jobs</span>
+              <Briefcase className="h-4 w-4 text-emerald-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.open_jobs ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Active mandates</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Pending Tasks</span>
+              <CheckSquare className="h-4 w-4 text-violet-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.pending_tasks ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Due for action</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Interviews</span>
+              <Calendar className="h-4 w-4 text-rose-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : adminStats?.upcoming_interviews ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Scheduled calls</p>
+          </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">My Leads</span>
+              <Clock className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : staffStats?.my_leads ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Assigned leads</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">My Candidates</span>
+              <Users className="h-4 w-4 text-indigo-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : staffStats?.my_candidates ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Under management</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">My Employers</span>
+              <Building2 className="h-4 w-4 text-emerald-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : staffStats?.my_employers ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Client accounts</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">My Tasks</span>
+              <CheckSquare className="h-4 w-4 text-violet-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-slate-900">
+              {isLoading ? "..." : staffStats?.my_tasks ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Follow-ups due</p>
+          </Card>
+
+          <Card className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Overdue</span>
+              <Clock className="h-4 w-4 text-rose-600" />
+            </div>
+            <div className="mt-2 text-2xl font-bold text-rose-600">
+              {isLoading ? "..." : staffStats?.overdue_tasks ?? 0}
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Needs attention</p>
+          </Card>
+        </div>
+      )}
+
+      {/* Main Two-Column View */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 space-y-4">
+          <Card>
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold text-slate-900">
+                  {isSuperAdmin ? "High Priority & Urgent Tasks" : "My Follow-up Tasks"}
+                </CardTitle>
+                <CardDescription>
+                  {isSuperAdmin ? "System-wide pending items requiring action" : "Your active assignments and client calls"}
+                </CardDescription>
+              </div>
+              <Link href="/tasks">
+                <Button variant="ghost" size="sm" className="text-xs text-blue-600">
+                  View All <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const tasks: Task[] = isSuperAdmin
+                  ? adminStats?.urgent_tasks || []
+                  : staffStats?.today_tasks || [];
+
+                if (tasks.length === 0) {
+                  return (
+                    <EmptyState
+                      icon={CheckSquare}
+                      title="No pending tasks"
+                      description="You are completely caught up! New assigned tasks will show here."
+                    />
+                  );
+                }
+
+                return (
+                  <div className="divide-y divide-slate-100">
+                    {tasks.map((task) => (
+                      <div key={task.id} className="py-3 flex items-start justify-between gap-3 group">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-slate-900 truncate">
+                              {task.title}
+                            </span>
+                            <Badge
+                              variant={
+                                task.priority === "urgent" || task.priority === "high"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
+                              className="text-[10px] uppercase"
+                            >
+                              {task.priority}
+                            </Badge>
+                          </div>
+                          {task.description && (
+                            <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
+                              {task.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-400">
+                            {task.due_date && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(task.due_date).toLocaleDateString()}
+                              </span>
+                            )}
+                            {task.assigned_user && (
+                              <span>Assigned: {task.assigned_user.first_name} {task.assigned_user.last_name}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0 h-7 text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50"
+                          disabled={completeTaskMutation.isPending}
+                          onClick={() => completeTaskMutation.mutate(task.id)}
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                          Done
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-5 space-y-4">
+          <Card>
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                  <ActivityIcon className="h-4 w-4 text-blue-600" />
+                  Recent CRM Activity
+                </CardTitle>
+                <CardDescription>Live audit stream of candidate & lead events</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const activities = stats?.recent_activities || [];
+                if (activities.length === 0) {
+                  return (
+                    <EmptyState
+                      icon={ActivityIcon}
+                      title="No recent activity"
+                      description="Actions performed by staff or system automation will appear in this timeline."
+                    />
+                  );
+                }
+
+                return (
+                  <div className="space-y-4">
+                    {activities.map((act) => (
+                      <div key={act.id} className="flex gap-3 text-xs">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700 font-medium">
+                          {act.activity_type.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-slate-800">{act.title}</p>
+                          {act.description && (
+                            <p className="text-slate-500 mt-0.5 line-clamp-2">{act.description}</p>
+                          )}
+                          <p className="text-[10px] text-slate-400 mt-1">
+                            {new Date(act.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} •{" "}
+                            {act.user ? `${act.user.first_name} ${act.user.last_name}` : "System"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
-

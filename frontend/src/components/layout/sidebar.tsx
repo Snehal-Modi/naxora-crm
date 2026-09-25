@@ -72,7 +72,7 @@ export function Sidebar({ className, onClose }: { className?: string; onClose?: 
           title: "Employers",
           href: "/employers",
           icon: Building2,
-          permission: "employers:view",
+          permission: "companies:view",
         },
         {
           title: "Jobs",
@@ -107,6 +107,7 @@ export function Sidebar({ className, onClose }: { className?: string; onClose?: 
           href: "/tasks",
           icon: CheckSquare,
           comingSoon: true,
+          permission: "tasks:view",
         },
         {
           title: "Attendance",

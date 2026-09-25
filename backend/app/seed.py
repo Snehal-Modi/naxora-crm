@@ -1,4 +1,4 @@
-"""Database seeder for permissions, initial roles, and admin user."""
+"""Database seeder for permissions, initial roles, admin user, and pipelines."""
 
 import logging
 from sqlalchemy import select
@@ -9,6 +9,7 @@ from app.core.security import hash_password
 from app.models.permission import Permission
 from app.models.role import Role
 from app.models.user import User
+from app.models.pipeline import Pipeline, PipelineStage
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("seed")
@@ -25,22 +26,56 @@ INITIAL_PERMISSIONS = [
     ("leads:create", "leads", "Create new leads"),
     ("leads:edit", "leads", "Update lead status and details"),
     ("leads:delete", "leads", "Delete leads"),
+    ("leads:archive", "leads", "Archive leads"),
+    ("leads:assign", "leads", "Assign or reassign leads to staff"),
     
     # Candidates
     ("candidates:view", "candidates", "View candidate profiles and resumes"),
     ("candidates:create", "candidates", "Create new candidate records"),
     ("candidates:edit", "candidates", "Edit candidate profiles"),
     ("candidates:delete", "candidates", "Archive candidate records"),
+    ("candidates:archive", "candidates", "Archive or soft-delete candidates"),
 
     # Employers
     ("employers:view", "employers", "View employer company profiles"),
     ("employers:create", "employers", "Register new employer accounts"),
     ("employers:edit", "employers", "Edit employer details"),
+    # Employers / Companies
+    ("companies:view", "companies", "View employer company profiles"),
+    ("companies:create", "companies", "Register new employer accounts"),
+    ("companies:edit", "companies", "Edit employer details"),
+    ("companies:archive", "companies", "Archive employer profiles"),
+
+    # Contacts
+    ("contacts:view", "contacts", "View company contact persons"),
+    ("contacts:create", "contacts", "Add company contact persons"),
+    ("contacts:edit", "contacts", "Edit company contact details"),
+    ("contacts:archive", "contacts", "Archive company contacts"),
 
     # Jobs
     ("jobs:view", "jobs", "View job openings"),
     ("jobs:create", "jobs", "Post new job requirements"),
     ("jobs:edit", "jobs", "Modify job requirements"),
+    ("jobs:archive", "jobs", "Archive job requirements"),
+
+    # Pipelines
+    ("pipelines:view", "pipelines", "View CRM pipelines and stages"),
+    ("pipelines:manage", "pipelines", "Create and configure pipelines and stages"),
+
+    # Tasks
+    ("tasks:view", "tasks", "View assigned or team tasks"),
+    ("tasks:create", "tasks", "Create new tasks and follow-ups"),
+    ("tasks:edit", "tasks", "Edit task details"),
+    ("tasks:complete", "tasks", "Mark tasks as completed"),
+
+    # Activities
+    ("activities:view", "activities", "View CRM chronological activity timeline"),
+    ("activities:create", "activities", "Log calls, meetings, notes, and activities"),
+
+    # Notes
+    ("notes:view", "notes", "View CRM notes"),
+    ("notes:create", "notes", "Add notes to candidates, leads, employers, or jobs"),
+    ("notes:edit", "notes", "Edit existing notes"),
 
     # Reports
     ("reports:view", "reports", "Access CRM analytics and operational reports"),
@@ -57,8 +92,37 @@ STAFF_PERMISSIONS = [
     "leads:view", "leads:create", "leads:edit",
     "candidates:view", "candidates:create", "candidates:edit",
     "employers:view", "employers:create", "employers:edit",
+    "leads:view", "leads:create", "leads:edit", "leads:archive",
+    "candidates:view", "candidates:create", "candidates:edit", "candidates:archive",
+    "companies:view", "companies:create", "companies:edit", "companies:archive",
+    "contacts:view", "contacts:create", "contacts:edit",
     "jobs:view", "jobs:create", "jobs:edit",
+    "pipelines:view",
+    "tasks:view", "tasks:create", "tasks:edit", "tasks:complete",
+    "activities:view", "activities:create",
+    "notes:view", "notes:create", "notes:edit",
     "reports:view"
+]
+
+CANDIDATE_PIPELINE_STAGES = [
+    ("New", "#64748B"),
+    ("Contacted", "#3B82F6"),
+    ("Screening", "#8B5CF6"),
+    ("Training", "#F59E0B"),
+    ("Submitted", "#EC4899"),
+    ("Interview", "#6366F1"),
+    ("Placed", "#10B981"),
+    ("Closed", "#94A3B8"),
+]
+
+EMPLOYER_PIPELINE_STAGES = [
+    ("New", "#64748B"),
+    ("Contacted", "#3B82F6"),
+    ("Requirement Received", "#8B5CF6"),
+    ("Candidates Submitted", "#EC4899"),
+    ("Interview", "#6366F1"),
+    ("Hired", "#10B981"),
+    ("Closed", "#94A3B8"),
 ]
 
 
@@ -102,6 +166,32 @@ def seed_database(db: Session) -> None:
         staff_role.permissions = [permission_map[code] for code in STAFF_PERMISSIONS if code in permission_map]
         db.add(staff_role)
         logger.info("Created staff role")
+    else:
+        staff_role.permissions = [permission_map[code] for code in STAFF_PERMISSIONS if code in permission_map]
+
+    db.commit()
+
+    # Seed Default Pipelines
+    logger.info("Seeding default CRM pipelines...")
+    cand_pipeline = db.scalar(select(Pipeline).where(Pipeline.name == "Candidate Pipeline"))
+    if not cand_pipeline:
+        cand_pipeline = Pipeline(name="Candidate Pipeline", lead_type="candidate", is_default=True)
+        db.add(cand_pipeline)
+        db.flush()
+        for idx, (stage_name, color) in enumerate(CANDIDATE_PIPELINE_STAGES):
+            stage = PipelineStage(pipeline_id=cand_pipeline.id, name=stage_name, stage_order=idx + 1, color=color)
+            db.add(stage)
+        logger.info("Created Candidate Pipeline with stages")
+
+    emp_pipeline = db.scalar(select(Pipeline).where(Pipeline.name == "Employer Pipeline"))
+    if not emp_pipeline:
+        emp_pipeline = Pipeline(name="Employer Pipeline", lead_type="employer", is_default=True)
+        db.add(emp_pipeline)
+        db.flush()
+        for idx, (stage_name, color) in enumerate(EMPLOYER_PIPELINE_STAGES):
+            stage = PipelineStage(pipeline_id=emp_pipeline.id, name=stage_name, stage_order=idx + 1, color=color)
+            db.add(stage)
+        logger.info("Created Employer Pipeline with stages")
 
     db.commit()
 

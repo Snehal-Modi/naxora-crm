@@ -4,7 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "secondary" | "success" | "warning" | "danger" | "outline";
+  variant?: "default" | "secondary" | "success" | "warning" | "danger" | "destructive" | "outline";
 }
 
 export function Badge({ className, variant = "default", ...props }: BadgeProps) {
@@ -14,6 +14,7 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
     success: "bg-emerald-100 text-emerald-800 border-emerald-200",
     warning: "bg-amber-100 text-amber-800 border-amber-200",
     danger: "bg-rose-100 text-rose-800 border-rose-200",
+    destructive: "bg-rose-100 text-rose-800 border-rose-200",
     outline: "text-slate-700 border-slate-300",
   };
 
